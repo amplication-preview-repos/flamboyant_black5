@@ -1,0 +1,82 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Wedding {
+  createdAt         DateTime           @default(now())
+  culturalPractices CulturalPractice[]
+  date              DateTime?
+  description       String?
+  host              String?
+  id                String             @id @default(cuid())
+  location          String?
+  registrations     Registration[]
+  title             String?
+  updatedAt         DateTime           @updatedAt
+}
+
+model UserProfile {
+  createdAt   DateTime             @default(now())
+  description String?
+  email       String?
+  id          String               @id @default(cuid())
+  name        String?
+  role        EnumUserProfileRole?
+  updatedAt   DateTime             @updatedAt
+}
+
+model CulturalPractice {
+  createdAt   DateTime @default(now())
+  description String?
+  id          String   @id @default(cuid())
+  name        String?
+  updatedAt   DateTime @updatedAt
+  wedding     Wedding? @relation(fields: [weddingId], references: [id])
+  weddingId   String?
+}
+
+model Registration {
+  attendee  String?
+  createdAt DateTime                @default(now())
+  id        String                  @id @default(cuid())
+  payments  Payment[]
+  status    EnumRegistrationStatus?
+  updatedAt DateTime                @updatedAt
+  wedding   Wedding?                @relation(fields: [weddingId], references: [id])
+  weddingId String?
+}
+
+model Payment {
+  amount         Float?
+  createdAt      DateTime      @default(now())
+  date           DateTime?
+  id             String        @id @default(cuid())
+  registration   Registration? @relation(fields: [registrationId], references: [id])
+  registrationId String?
+  updatedAt      DateTime      @updatedAt
+}
+
+model User {
+  createdAt DateTime @default(now())
+  email     String?  @unique
+  firstName String?
+  id        String   @id @default(cuid())
+  lastName  String?
+  password  String
+  roles     Json
+  updatedAt DateTime @updatedAt
+  username  String   @unique
+}
+
+enum EnumUserProfileRole {
+  Option1
+}
+
+enum EnumRegistrationStatus {
+  Option1
+}
